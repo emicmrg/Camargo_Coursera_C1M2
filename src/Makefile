@@ -27,16 +27,24 @@ include sources.mk
 #PLATFORM = 
 
 # Architectures Specific Flags
-LINKER_FILE = 
-CPU = 
-ARCH = 
-SPECS = 
+ifeq($(PLATFORM), MSP432)
+	LINKER_FILE = msp432p401r.lds
+	CPU = cortex-m4
+	ARCH = thumb
+	SPECS = nosys.specs
+endif
 
 # Compiler Flags and Defines
 ifeq($(PLATFORM), HOST)
 	CC = gcc
-	LD = 
+	LD = gcc-ld
 	LDFLAGS = 
 	CFLAGS = 
 	CPPFLAGs = 
 else
+	CC = arm-none-eabi-gcc
+	LD = arm-none-eabi-ld
+	LDFLAGS = 
+	CFLAGS = 
+	CPPFLAGs = 
+endif
