@@ -75,6 +75,7 @@ ifeq ($(PLATFORM), MSP432)
 			   -E
 	SOURCES = $(MSP432_S)
 	INCLUDES = $(MSP432_I)
+	SIZE = arm-none-eabi-size
 endif
 ifeq ($(PLATFORM), HOST)
 	CC = gcc
@@ -84,6 +85,7 @@ ifeq ($(PLATFORM), HOST)
 	CPPFLAGs = -std=c99 -Wall -Werror -E
 	SOURCES = $(HOST_S)
 	INCLUDES = $(HOST_I)
+	SIZE = size
 else
 	SOURCES = $(MSP432_S)
 	INCLUDES = $(MSP432_I)
@@ -106,6 +108,9 @@ compile-all: $(OBJS)
 
 .PHONY: build
 build: $(TARGET).out
+	$(SIZE) -Atd $(TARGET).out
+	$(SIZE) -Bx $(TARGET).out
+	$(SIZE) -Btd $(TARGET).out
 
 $(TARGET).out: $(OBJS)
 	$(CC) $(OBJS) $(CFLAGS) $(LDFLAGS) -o $@
