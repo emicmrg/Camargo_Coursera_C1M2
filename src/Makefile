@@ -79,7 +79,7 @@ endif
 ifeq ($(PLATFORM), HOST)
 	CC = gcc
 	LD = ld
-	LDFLAGS = -O0
+	LDFLAGS = -O0 -Wl,-Map=$(TARGET).map
 	CFLAGS = -std=c99 -Wall -Werror
 	CPPFLAGs = -std=c99 -Wall -Werror -E
 	SOURCES = $(HOST_S)
