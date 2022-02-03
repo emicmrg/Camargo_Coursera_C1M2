@@ -68,10 +68,7 @@ ifeq ($(PLATFORM), MSP432)
 	SOURCES = $(MSP432_S)
 	INCLUDES = $(MSP432_I)
 	SIZE = arm-none-eabi-size
-<<<<<<< HEAD
-=======
 	OBJDUMP_TOOL = arm-none-eabi-objdump
->>>>>>> dev_c1m2
 endif
 
 ifeq ($(PLATFORM), HOST)
@@ -83,13 +80,7 @@ ifeq ($(PLATFORM), HOST)
 	SOURCES = $(HOST_S)
 	INCLUDES = $(HOST_I)
 	SIZE = size
-<<<<<<< HEAD
-else
-	SOURCES = $(MSP432_S)
-	INCLUDES = $(MSP432_I)
-=======
 	OBJDUMP_TOOL = objdump
->>>>>>> dev_c1m2
 endif
 
 OBJS:= $(SOURCES:.c=.o)
@@ -115,21 +106,11 @@ compile-all:
 	$(CC) -D$(PLATFORM) $(INCLUDES) $(CFLAGS) -c $(SOURCES)
 
 .PHONY: build
-<<<<<<< HEAD
-build: $(TARGET).out
-	$(SIZE) -Atd $(TARGET).out
-	$(SIZE) -Bx $(TARGET).out
-	$(SIZE) -Btd $(TARGET).out
-
-$(TARGET).out: $(OBJS)
-	$(CC) $(OBJS) $(CFLAGS) $(LDFLAGS) -o $@
-=======
 build:
 	$(CC) -D$(PLATFORM) $(INCLUDES) $(CFLAGS) $(LDFLAGS) $(SOURCES) -o $(TARGET).out
 	$(SIZE) -Atd $(TARGET).out
 	$(SIZE) -Bx $(TARGET).out
 	$(SIZE) -Btd $(TARGET).out
->>>>>>> dev_c1m2
 
 .PHONY: clean
 clean:
