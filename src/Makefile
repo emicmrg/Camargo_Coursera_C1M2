@@ -53,60 +53,69 @@ endif
 ifeq ($(PLATFORM), MSP432)
 	CC = arm-none-eabi-gcc
 	LD = arm-none-eabi-ld
-	LDFLAGS = -O0 -Wl,-Map=$(TARGET).map -Wl,-T $(LINKER_FILE)
+	LDFLAGS = -Wl,-Map=$(TARGET).map -Wl,-T $(LINKER_FILE)
 	CFLAGS = -mcpu=$(CPU) \
 	         -m$(ARCH) \
 			 -march=armv7e-m \
 			 -mfloat-abi=hard \
 			 -mfpu=fpv4-sp-d16 \
 			 --specs=$(SPECS) \
+			 -g \
 			 -std=c99 \
+			 -O0 \
 			 -Wall \
 			 -Werror
-	CPPFLAGs = -mcpu=$(CPU) \
-	           -m$(ARCH) \
-			   -march=armv7e-m \
-			   -mfloat-abi=hard \
-			   -mfpu=fpv4-sp-d16 \
-			   --specs=$(SPECS) \
-			   -std=c99 \
-			   -Wall \
-			   -Werror \
-			   -E
 	SOURCES = $(MSP432_S)
 	INCLUDES = $(MSP432_I)
 	SIZE = arm-none-eabi-size
+<<<<<<< HEAD
+=======
+	OBJDUMP_TOOL = arm-none-eabi-objdump
+>>>>>>> dev_c1m2
 endif
+
 ifeq ($(PLATFORM), HOST)
 	CC = gcc
 	LD = ld
-	LDFLAGS = -O0 -Wl,-Map=$(TARGET).map
-	CFLAGS = -std=c99 -Wall -Werror
-	CPPFLAGs = -std=c99 -Wall -Werror -E
+	LDFLAGS = -Wl,-Map=$(TARGET).map
+	CFLAGS = -g -std=c99 -O0 -Wall -Werror
+	CPPFLAGS = -M -MF
 	SOURCES = $(HOST_S)
 	INCLUDES = $(HOST_I)
 	SIZE = size
+<<<<<<< HEAD
 else
 	SOURCES = $(MSP432_S)
 	INCLUDES = $(MSP432_I)
+=======
+	OBJDUMP_TOOL = objdump
+>>>>>>> dev_c1m2
 endif
 
-OBJS = $(SOURCES:.c=.o)
-ASMF = $(SOURCES:.c=.asm)
-LNKF = $(SOURCES:.c=.i)
+OBJS:= $(SOURCES:.c=.o)
+ASMF:= $(SOURCES:.c=.asm)
+LNKF:= $(SOURCES:.c=.i)
+MAPS:= $(SOURCES:.c=.map)
+OUTS:= $(SOURCES:.c=.out)
+
+%.i : %.c
+	$(CC) -D$(PLATFORM) $(INCLUDES) $(CFLAGS) -E -o $@ $<
 
 %.asm : %.c
-	$(CC) -D$(PLATFORM) $(INCLUDES) -g $(CFLAGS) -S $< -o $@
-%.i : %.c
-	$(CC) -D$(PLATFORM) $(INCLUDES) $(CPPFLAGs) $< -o $@
+	$(CC) -D$(PLATFORM) $(INCLUDES) $(CFLAGS) $< -S
+
+%.asm : %.out
+	$(OBJDUMP_TOOL) --disassemble $< > $@
 
 %.o : %.c
-	$(CC) -c -D$(PLATFORM) $(INCLUDES) $(CFLAGS) $< -o $@
+	$(CC) -D$(PLATFORM) $(INCLUDES) $(CFLAGS) -c $<
 
 .PHONY: compile-all
-compile-all: $(OBJS)
+compile-all:
+	$(CC) -D$(PLATFORM) $(INCLUDES) $(CFLAGS) -c $(SOURCES)
 
 .PHONY: build
+<<<<<<< HEAD
 build: $(TARGET).out
 	$(SIZE) -Atd $(TARGET).out
 	$(SIZE) -Bx $(TARGET).out
@@ -114,7 +123,14 @@ build: $(TARGET).out
 
 $(TARGET).out: $(OBJS)
 	$(CC) $(OBJS) $(CFLAGS) $(LDFLAGS) -o $@
+=======
+build:
+	$(CC) -D$(PLATFORM) $(INCLUDES) $(CFLAGS) $(LDFLAGS) $(SOURCES) -o $(TARGET).out
+	$(SIZE) -Atd $(TARGET).out
+	$(SIZE) -Bx $(TARGET).out
+	$(SIZE) -Btd $(TARGET).out
+>>>>>>> dev_c1m2
 
 .PHONY: clean
 clean:
-	rm -f $(OBJS) $(ASMF) $(LNKF) $(TARGET).out $(TARGET).map 
+	rm -f *.i *.d *.map *.s *.asm *.out *.o 
